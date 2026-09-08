@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const baseURL = 'https://mobile-money-backend-tcyb.onrender.com'
+const baseURL = 'https://crown-ledger-backend.onrender.com'
 // const baseURL = 'http://localhost:5000'
 
 interface ApiClientOptions extends RequestInit {
