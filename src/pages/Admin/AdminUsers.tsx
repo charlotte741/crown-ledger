@@ -47,6 +47,7 @@ import {
   TrendingUp as TrendingUpIcon,
   AccountBalanceWallet as WalletIcon,
   Email as EmailIcon,
+  Inbox as InboxIcon
 } from '@mui/icons-material';
 import {
   useAdminUsersBalances,
@@ -1664,6 +1665,10 @@ export default function AdminUsers() {
             }}
           >
             Wallets
+          </Button>
+
+          <Button onClick={() => navigate('/admin/inbox')} startIcon={<InboxIcon />}>
+            Inbox
           </Button>
         </Box>
       </Box>

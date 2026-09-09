@@ -15,6 +15,7 @@ import ResetPassword from "../pages/Auth/ResetPassword";
 import VerifyEmail from "../pages/Auth/Verifyemail";
 import AdminUsers from "../pages/Admin/AdminUsers";
 import AdminWallets from "../pages/Admin/AdminWallets";
+import AdminInbox from '../pages/Admin/AdminInbox';
 
 const hasSession = () =>
     typeof window !== "undefined" && Boolean(localStorage.getItem("accessToken"));
@@ -80,7 +81,8 @@ export const Router = createBrowserRouter([
                         element: <DashboardLayout />,
                         children: [
                             { index: true, element: <AdminUsers /> },
-                            {path: "/admin/wallets", element: <AdminWallets />}
+                            {path: "/admin/wallets", element: <AdminWallets />},
+                            {path: "/admin/inbox", element: <AdminInbox />}
                         ],
                     },
                 ],
