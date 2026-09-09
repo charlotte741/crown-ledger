@@ -33,6 +33,7 @@ import {
   useAdminInboxThread,
   useReplyToThread,
   useUpdateThreadStatus,
+  useGetAttachmentUrl,
   type InboxThread,
   type InboxMessage,
   type ThreadStatus,
@@ -218,8 +219,24 @@ function ThreadListSkeleton() {
 
 // ─── Message Bubble ──────────────────────────────────────────────────────────
 
+
 function MessageBubble({ message }: { message: InboxMessage }) {
   const isOutbound = message.direction === 'outbound';
+  const getAttachmentUrl = useGetAttachmentUrl();
+  const [openingId, setOpeningId] = useState<string | null>(null);
+
+  const handleOpenAttachment = async (attachmentId?: string) => {
+    if (!attachmentId) return;
+    setOpeningId(attachmentId);
+    try {
+      const { downloadUrl } = await getAttachmentUrl.mutateAsync({ messageId: message._id, attachmentId });
+      window.open(downloadUrl, '_blank', 'noopener,noreferrer');
+    } catch {
+      // Silently ignored here — the chip just won't open; add a snackbar if you want feedback.
+    } finally {
+      setOpeningId(null);
+    }
+  };
 
   return (
     <Box sx={{ display: 'flex', justifyContent: isOutbound ? 'flex-end' : 'flex-start', mb: 1.6 }}>
@@ -246,21 +263,22 @@ function MessageBubble({ message }: { message: InboxMessage }) {
               <Chip
                 key={i}
                 size="small"
-                icon={<AttachFileIcon sx={{ fontSize: '0.9rem !important' }} />}
+                clickable={!!a.resendAttachmentId}
+                onClick={() => handleOpenAttachment(a.resendAttachmentId)}
+                icon={
+                  openingId === a.resendAttachmentId ? (
+                    <CircularProgress size={12} sx={{ ml: '6px !important' }} />
+                  ) : (
+                    <AttachFileIcon sx={{ fontSize: '0.9rem !important' }} />
+                  )
+                }
                 label={a.filename}
                 sx={{ bgcolor: ink[50], color: ink[600], fontSize: '0.68rem', height: 22 }}
               />
             ))}
           </Box>
         )}
-        <Typography
-          sx={{
-            fontSize: '0.66rem',
-            color: ink[400],
-            mt: 0.5,
-            textAlign: isOutbound ? 'right' : 'left',
-          }}
-        >
+        <Typography sx={{ fontSize: '0.66rem', color: ink[400], mt: 0.5, textAlign: isOutbound ? 'right' : 'left' }}>
           {isOutbound ? 'You' : message.fromName || message.fromEmail} · {formatFullTime(message.createdAt)}
         </Typography>
       </Box>

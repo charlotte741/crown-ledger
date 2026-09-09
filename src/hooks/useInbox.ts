@@ -21,6 +21,7 @@ export interface InboxAttachment {
   filename: string;
   contentType: string;
   size?: number;
+  resendAttachmentId?: string;
 }
 
 export interface InboxMessage {
@@ -170,6 +171,30 @@ export const useUpdateThreadStatus = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-inbox-thread', data._id] });
       queryClient.invalidateQueries({ queryKey: ['admin-inbox-threads'] });
+    },
+  });
+};
+
+interface AttachmentUrlResponse {
+  success: boolean;
+  message?: string;
+  data: { filename: string; contentType: string; downloadUrl: string; expiresAt: string };
+}
+
+// ─── Get Attachment Download URL Hook ──────────────────────────────────────
+export const useGetAttachmentUrl = () => {
+  return useMutation({
+    mutationFn: async ({ messageId, attachmentId }: { messageId: string; attachmentId: string }) => {
+      const response = (await apiClient(
+        `admin/inbox/messages/${messageId}/attachments/${attachmentId}`,
+        { method: 'GET' }
+      )) as AttachmentUrlResponse;
+
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to fetch attachment');
+      }
+
+      return response.data;
     },
   });
 };
